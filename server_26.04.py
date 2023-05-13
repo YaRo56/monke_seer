@@ -14,7 +14,8 @@ import numpy as np
 
 
 # хост и порт
-HOST = 'localhost'
+HOST = '178.159.39.222'
+# HOST = "localhost"
 PORT = 8888
 
 # создаем серверный сокет
@@ -220,8 +221,19 @@ def handle_client(client_socket, model):
         # data_arr[:,:,2] = r
         # img = Image.fromarray(data_arr, mode="")
         # img.show()
+
+
+
+
         client_socket.sendall(str(ML(data_arr, model)).encode('utf-8'))
-        print('obj send')
+        # print('obj send')
+
+        # client_socket.sendall("Got data, send response".encode('utf-8'))
+        print('send msg to client')
+        break
+
+
+
 
 
 
