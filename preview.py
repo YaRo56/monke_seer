@@ -5,7 +5,7 @@ from kivy.properties import ColorProperty, StringProperty, ObjectProperty
 from kivy.utils import platform
 from threading import Thread, Event, currentThread
 
-from time import sleep
+
 
 if platform == 'android':
     from .preview_camerax import PreviewCameraX as CameraPreview
@@ -60,12 +60,15 @@ class Preview(AnchorLayout):
         self.camera_connected = False
         self._image_available = Event()
         self.analyze_resolution = 1024
+
         self.mode = 1
         self.prevmode = 0
         self.T = []
         self.T800 = []
         self.tr = None
         self.DIE_FLAG = 0
+
+
         self.auto_analyze_resolution = []
     
     def on_orientation(self,instance,orientation):
@@ -97,19 +100,10 @@ class Preview(AnchorLayout):
         if enable_analyze_pixels:
             ##CHANGE!! NOW IT TURNING FROM 1 TO 2 MODE(probably)
 
-            if mode == 2:
-                self.disconnect_camera()
-
-
-            if mode == 1:
-                print('i was there in mode_1 ')
-                print('and there in mode_1')
-
-                self.tr = Thread(target=self.image_scheduler, name = "mode1", daemon=True)
-                self.T.append("mode1")
-                self.T800.append(self.tr)
-                self.tr.start()
-
+            self.tr = Thread(target=self.image_scheduler, name = "mode1", daemon=True)
+            self.T.append("mode1")
+            self.T800.append(self.tr)
+            self.tr.start()
 
         self.preview.connect_camera(analyze_callback =
                                         self.analyze_image_callback_schedule,
@@ -127,6 +121,7 @@ class Preview(AnchorLayout):
 
     def capture_screenshot(self, **kwargs):
         self.preview.capture_screenshot(**kwargs)
+        # print(self.preview.OBJECT)
 
     def select_camera(self, camera_id):
         return self.preview.select_camera(camera_id)
@@ -217,19 +212,20 @@ class Preview(AnchorLayout):
             self._image_available.wait()
             self._image_available.clear()
             # print(currentThread().name + "   DIE DIE DIE DIE "+ str(self.DIE_FLAG)+ ' ')
-            print(currentThread().name+"   ", len(self.T))
-            if (not self.camera_connected) or (self.DIE_FLAG == 1):
+            # print(currentThread().name+"   ", len(self.T))
+            if (not self.camera_connected):
                 self._image_available.set()
-                print("БЛЯТЬ Я ВЫШЕЛ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,.")
+                # print("БЛЯТЬ Я ВЫШЕЛ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,.")
                 break
-                print("WTF")
+                # print("WTF")
 
 
 
             # Must pass pixels not Texture, becuase we are in a different
             # Thread
-            if currentThread().name == self.T[0]:
-                self.analyze_pixels_callback(self.pixels, self.im_size, self.tpos,
+
+
+            self.analyze_pixels_callback(self.pixels, self.im_size, self.tpos,
                                          self.scale, self.mirror, self.mode)
             self._busy = False
 
